@@ -1,134 +1,194 @@
-// At the TOP of src/index.ts
-import type { User, Course, Submission } from "../types/index";
-import type { StringOrNumber } from "../types/index";
+// ===== IMPORTS =====
+import type {
+  User,
+  Items,
+  Claims,
+  ApiResponse,
+  StringOrNumber,
+  UserUpdate,
+  UserPreview,
+  PublicUser,
+  RoleCount,
+} from "./types/index";
+
+import { SubmissionStatus, Role } from "./types/index";
 
 
 // ===== PRIMITIVE TYPE ANNOTATIONS =====
+
 // Variables with explicit types
-const projectName: string = "itelect4-project";
+const projectName: string = "Campus Lost & Found Tracker";
 const currentYear: number = 2026;
-const isFullStack: boolean = true;
+const isWebApp: boolean = true;
 const nothing: null = null;
 const notSet: undefined = undefined;
+
 // Function: typed parameters + typed return value
 function greet(name: string, year: number): string {
-  return `Welcome to ${name} -- AY ${year}!`;
+  return `Welcome to ${name} - AY ${year}!`;
 }
+
 // void: function that does NOT return a value
 function logMessage(message: string): void {
   console.log(message);
 }
+
 logMessage(greet(projectName, currentYear));
 
 
 // ===== USING INTERFACES =====
+
 const student: User = {
   id: 1,
-  name: "Juan dela Cruz",
+  name: "Juan Dela Cruz",
   email: "juan@example.com",
   role: "student",
   isActive: true,
 };
-const course: Course = {
-  code: "ITELECT4",
-  title: "IT Elective 4",
-  units: 3,
-  semester: "1st Semester 2026-2027",
+
+const item: Items = {
+  id: 1,
+  name: "Black Wallet",
+  description: "Contains school ID and cards",
+  location: "Library",
+  dateLost: new Date(),
+  status: "lost",
+  ownerId: 1,
 };
+
+const claim: Claims = {
+  id: 1,
+  itemId: 1,
+  claimantId: 2,
+  claimDate: new Date(),
+  status: "approved",
+  proof: "Student ID presented",
+};
+
 console.log(student);
-console.log(course);
+console.log(item);
+console.log(claim);
 
 
 // ===== TYPE NARROWING =====
+
 // Narrowing with typeof
-// Without the if-check, TypeScript would error:
-// Property 'toUpperCase' does not exist on type 'number'
 function processInput(input: StringOrNumber): string {
   if (typeof input === "string") {
-    return input.toUpperCase(); // TypeScript knows: input is string here
+    return input.toUpperCase();
   }
-  return input.toFixed(2); // TypeScript knows: input is number here
+
+  return input.toFixed(2);
 }
+
 // Narrowing with instanceof
-// Used with class instances like Date, Error, etc.
 function formatDate(value: string | Date): string {
   if (value instanceof Date) {
-    return value.toLocaleDateString(); // TypeScript knows: it's a Date
+    return value.toLocaleDateString();
   }
-  return value; // TypeScript knows: it's a string
+
+  return value;
 }
-console.log(processInput("hello")); // HELLO
-console.log(processInput(3.14159)); // 3.14
-console.log(formatDate(new Date())); // e.g. 7/4/2026
+
+console.log(processInput("wallet"));
+console.log(processInput(101));
+console.log(formatDate(new Date()));
 
 
 // ===== GENERIC FUNCTIONS =====
-// T is inferred automatically from whatever array you pass in
+
 function getFirst<T>(items: T[]): T | undefined {
   return items[0];
 }
-// Constrained generic -- T must have an "id: number" field
+
 function getById<T extends { id: number }>(
   items: T[],
   id: number,
 ): T | undefined {
   return items.find((item) => item.id === id);
 }
-// [student] is an array containing one element
+
 const firstUser = getFirst<User>([student]);
-const foundUser = getById<User>([student], 1);
-// Each ?. checks whether the object on its left exists before trying to access the next property,
-// preventing errors if any part of the chain is null or undefined.
-console.log(firstUser?.name); // Juan dela Cruz
-console.log(foundUser?.email); // juan@example.com
+const foundItem = getById<Items>([item], 1);
+
+console.log(firstUser?.name);
+console.log(foundItem?.name);
 
 
-// ----- src/index.ts -----
-import type { ApiResponse } from "../types/index";
+// ===== GENERIC INTERFACE =====
+
 const userResponse: ApiResponse<User> = {
   success: true,
   data: student,
 };
-const courseResponse: ApiResponse<Course[]> = {
+
+const itemResponse: ApiResponse<Items[]> = {
   success: true,
-  data: [course],
+  data: [item],
 };
-console.log(userResponse.data.name); // Juan dela Cruz
+
+console.log(userResponse.data.name);
+console.log(itemResponse.data[0]?.name);
 
 
 // ===== USING UTILITY TYPES =====
-import type {
-  UserUpdate,
-  UserPreview,
-  PublicUser,
-  RoleCount,
-} from "../types/index";
-// Partial<T> -- update payload only needs the changed fields
-const patch: UserUpdate = { name: "Juan D. Cruz" };
-// Pick<T,K> -- a lightweight preview object
-const preview: UserPreview = { id: 1, name: "Juan dela Cruz", role: "student" };
-// Omit<T,K> -- safe to expose publicly (no email, no isActive)
-const publicProfile: PublicUser = {
+
+// Partial<T>
+const patch: UserUpdate = {
+  name: "Juan D. Cruz",
+};
+
+// Pick<T, K>
+const preview: UserPreview = {
   id: 1,
-  name: "Juan dela Cruz",
+  name: "Juan Dela Cruz",
   role: "student",
 };
-// Record<K,T> -- dashboard-style counts
-const roleCount: RoleCount = { student: 45, admin: 2, instructor: 3 };
+
+// Omit<T, K>
+const publicProfile: PublicUser = {
+  id: 1,
+  name: "Juan Dela Cruz",
+  role: "student",
+};
+
+// Record<K, T>
+const roleCount: RoleCount = {
+  student: 150,
+  securityAdmin: 5,
+};
+
+
 // ===== ReturnType<T> =====
-function makeSubmission(courseCode: string) {
-  return { id: 1, studentId: 1, courseCode, submittedAt: new Date() };
+
+function createClaim(itemId: number) {
+  return {
+    id: 1,
+    itemId,
+    claimantId: 2,
+    claimDate: new Date(),
+    status: "approved" as const,
+    proof: "Student ID presented",
+  };
 }
-// Infer the shape directly from the function -- no need to redeclare it
-type NewSubmission = ReturnType<typeof makeSubmission>;
-const gt1Submission: NewSubmission = makeSubmission("ITELECT4");
+
+type NewClaim = ReturnType<typeof createClaim>;
+
+const newClaim: NewClaim = createClaim(1);
+
+console.log(newClaim);
 
 
 // ===== USING ENUMS =====
-import { SubmissionStatus, Role } from "../types/index";
-let status: SubmissionStatus = SubmissionStatus.Pending;
-console.log(SubmissionStatus[status]); // "Pending" -- reverse mapping
-status = SubmissionStatus.Graded;
-console.log(status === SubmissionStatus.Graded); // true
-const currentRole: Role = Role.Student;
-console.log(currentRole); // "student"
+
+let status: SubmissionStatus = SubmissionStatus.Approved;
+
+console.log(SubmissionStatus[status]);
+
+status = SubmissionStatus.Rejected;
+
+console.log(status === SubmissionStatus.Rejected);
+
+const currentRole: Role = Role.SecurityAdmin;
+
+console.log(currentRole); // "securityAdmin"
