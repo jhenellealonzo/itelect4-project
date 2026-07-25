@@ -1,3 +1,5 @@
+import type { MouseEvent } from "react";
+
 import UserCard from "./components/UserCard";
 import ItemCard from "./components/ItemCard";
 import ClaimCard from "./components/ClaimCard";
@@ -32,22 +34,24 @@ function App() {
     proof: "Student ID presented",
   };
 
-  // Typed event handler
-  const handleClick = (): void => {
-    alert("Viewing Campus Lost & Found Tracker");
+  // Typed callback passed to ItemCard
+  const handleViewItem = (
+    event: MouseEvent<HTMLButtonElement>
+  ): void => {
+    console.log(event.currentTarget);
+    alert(`Viewing Item: ${item.name}`);
   };
 
   return (
     <div>
       <h1>Campus Lost & Found Tracker</h1>
 
-      <button onClick={handleClick}>
-        View Dashboard
-      </button>
-
       <UserCard user={user} />
 
-      <ItemCard item={item} />
+      <ItemCard
+        item={item}
+        onSelect={handleViewItem}
+      />
 
       <ClaimCard claim={claim} />
     </div>
