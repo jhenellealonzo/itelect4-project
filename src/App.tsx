@@ -1,9 +1,4 @@
-import {
-  useState,
-  useEffect,
-  useRef,
-  type MouseEvent,
-} from "react";
+import { useState, useEffect, useRef } from "react";
 
 import type { User, Items, Claims } from "./types";
 
@@ -11,30 +6,45 @@ import UserCard from "./components/UserCard";
 import ItemCard from "./components/ItemCard";
 import ClaimCard from "./components/ClaimCard";
 
-import {useToggle} from "./hooks/useToggle";
-import {usePrevious} from "./hooks/usePrevious";
+import { useToggle } from "./hooks/useToggle";
+import { usePrevious } from "./hooks/usePrevious";
 
 function App() {
-  // ===== TYPED STATE WITH useState<T> =====
+  // ===== STATE =====
 
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [items, setItems] = useState<Items[]>([]);
-  const [claim, setClaim] = useState<Claims | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [selectedUser, setSelectedUser] =
+    useState<User | null>(null);
 
-  // ===== SEARCH STATE =====
+  const [items, setItems] =
+    useState<Items[]>([]);
 
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [claim, setClaim] =
+    useState<Claims | null>(null);
 
-  // ===== useRef =====
+  const [isLoading, setIsLoading] =
+    useState<boolean>(true);
 
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [isError, setIsError] =
+    useState<boolean>(false);
+
+  const [searchTerm, setSearchTerm] =
+    useState<string>("");
+
+  // ===== REF =====
+
+  const searchInputRef =
+    useRef<HTMLInputElement>(null);
 
   // ===== CUSTOM HOOKS =====
 
-  const [showClaimDetails, toggleClaimDetails] = useToggle(false);
+  const [showDetails, toggleDetails] =
+    useToggle(false);
 
-  const previousSearch = usePrevious(searchTerm);
+  const [isDarkMode, toggleDarkMode] =
+    useToggle(false);
+
+  const previousSearch =
+    usePrevious(searchTerm);
 
   // ===== LOAD MOCK DATA =====
 
@@ -51,7 +61,7 @@ function App() {
       {
         id: 1,
         name: "Pink Umbrella",
-        description: "Left in the library",
+        description: "Left in the Library",
         location: "Library",
         dateLost: new Date(),
         status: "lost",
@@ -74,19 +84,20 @@ function App() {
       claimantId: 2,
       claimDate: new Date(),
       status: "approved",
-      proof: "Student ID presented",
+      proof: "Student ID Presented",
     };
 
-    // Simulate loading like the instructor
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setSelectedUser(mockUser);
       setItems(mockItems);
       setClaim(mockClaim);
       setIsLoading(false);
     }, 500);
+
+    return () => clearTimeout(timer);
   }, []);
 
-  // ===== TYPED onChange =====
+  // ===== EVENTS =====
 
   const handleSearchChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -94,95 +105,182 @@ function App() {
     setSearchTerm(e.target.value);
   };
 
-  // ===== TYPED CALLBACK =====
-
-  const handleViewItem = (
-    event: MouseEvent<HTMLButtonElement>
-  ): void => {
-    console.log(event.currentTarget);
-
-    if (filteredItems.length > 0) {
-      alert(`Viewing Item: ${filteredItems[0].name}`);
-    }
+  const focusSearch = (): void => {
+    searchInputRef.current?.focus();
   };
 
-  // ===== FILTERED DATA =====
+  const handleViewItem = (
+    item: Items
+  ): void => {
+    alert(`Viewing Item: ${item.name}`);
+  };
 
-  const filteredItems = items.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // ===== FILTER =====
+
+  const filteredItems = items.filter(
+    (item) =>
+      item.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      item.location
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
   );
 
   // ===== LOADING =====
 
   if (isLoading) {
-    return <p>Loading lost and found items...</p>;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <p className="animate-pulse text-lg text-gray-700 dark:text-gray-300">
+          Loading lost and found items...
+        </p>
+      </div>
+    );
   }
 
+  // ===== ERROR =====
+
+  if (isError) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="rounded-lg bg-red-100 p-6 text-red-700 dark:bg-red-900 dark:text-red-300">
+          <p>Could not load lost and found items.</p>
+
+          <button
+            onClick={() => setIsError(false)}
+            className="mt-4 rounded bg-red-600 px-4 py-2 text-white"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ===== RENDER =====
+
   return (
-    <div className="app">
-      <h1>Campus Lost & Found Tracker</h1>
+    <div className={isDarkMode ? "dark" : ""}>
+      <div className="min-h-screen bg-gray-50 p-6 transition-colors dark:bg-gray-900">
 
-      {/* Search */}
+        <h1 className="mb-6 text-4xl font-bold text-gray-900 dark:text-white">
+          Campus Lost & Found Tracker
+        </h1>
 
-      <input
-        ref={searchInputRef}
-        type="text"
-        placeholder="Search lost items..."
-        value={searchTerm}
-        onChange={handleSearchChange}
-      />
+        {/* Buttons */}
 
-      <button
-        onClick={() => searchInputRef.current?.focus()}
-      >
-        Focus Search
-      </button>
+        <div className="mb-6 flex gap-3">
 
-      {/* Previous Search */}
+          <button
+            onClick={toggleDarkMode}
+            className="rounded bg-gray-800 px-4 py-2 text-white hover:bg-gray-700 dark:bg-gray-200 dark:text-black"
+          >
+            {isDarkMode ? "Light Mode" : "Dark Mode"}
+          </button>
 
-      {previousSearch !== undefined &&
-        previousSearch !== searchTerm && (
-          <p>
-            Previous Search: "{previousSearch}"
-          </p>
+          <button
+            onClick={() => setIsError(true)}
+            className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+          >
+            Simulate Error
+          </button>
+
+        </div>
+
+        {/* Search */}
+
+        <input
+          ref={searchInputRef}
+          type="text"
+          placeholder="Search lost items..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="
+            w-full
+            rounded
+            border
+            border-gray-300
+            bg-white
+            p-3
+            text-gray-900
+            placeholder-gray-500
+            dark:border-gray-700
+            dark:bg-gray-800
+            dark:text-white
+            dark:placeholder-gray-400
+          "
+        />
+
+        <button
+          onClick={focusSearch}
+          className="mt-3 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+        >
+          Focus Search
+        </button>
+
+        {previousSearch !== undefined &&
+          previousSearch !== searchTerm && (
+            <p className="mt-3 text-gray-700 dark:text-gray-300">
+              Previous Search: "{previousSearch}"
+            </p>
+          )}
+
+        {/* User */}
+
+        {selectedUser && (
+          <>
+            <div className="mt-8">
+              <UserCard
+                user={selectedUser}
+                onSelect={setSelectedUser}
+              />
+            </div>
+
+            <p className="mt-3 text-gray-900 dark:text-white">
+              Selected User: {selectedUser.name}
+            </p>
+          </>
         )}
 
-      {/* User */}
+        {/* Toggle Claim */}
 
-      {selectedUser && (
-        <>
-          <UserCard user={selectedUser} />
+        <button
+          onClick={toggleDetails}
+          className="mt-8 rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+        >
+          {showDetails ? "Hide" : "Show"} Claim Details
+        </button>
 
-          <p>
-            Selected User: {selectedUser.name}
-          </p>
-        </>
-      )}
+        {/* Items */}
 
-      {/* Toggle Claim */}
+        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {filteredItems.map((item) => (
+            <ItemCard
+              key={item.id}
+              item={item}
+              onSelect={handleViewItem}
+              variant="default"
+            />
+          ))}
+        </div>
 
-      <button onClick={toggleClaimDetails}>
-        {showClaimDetails ? "Hide" : "Show"} Claim Details
-      </button>
+        {/* Claim */}
 
-      <br />
-      <br />
+        {showDetails && claim && (
+          <div className="mt-8">
+            <ClaimCard
+              claim={claim}
+              variant="default"
+            >
+              <p className="text-sm text-green-600 dark:text-green-400">
+                ✓ Claim approved. Ready for pickup.
+              </p>
+            </ClaimCard>
+          </div>
+        )}
 
-      {/* Items */}
-
-      {filteredItems.map((item) => (
-        <ItemCard
-          key={item.id}
-          item={item}
-          onSelect={handleViewItem}
-        />
-      ))}
-
-      {/* Claim */}
-
-      {showClaimDetails && claim && (
-        <ClaimCard claim={claim} />
-      )}
+      </div>
     </div>
   );
 }
