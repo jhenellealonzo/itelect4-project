@@ -23,8 +23,8 @@ function ClaimCard({
         bg-white
         p-5
         shadow-sm
-        dark:bg-gray-800
         dark:border-gray-700
+        dark:bg-gray-800
       "
     >
       <h3 className="text-lg font-bold text-gray-900 dark:text-white">
@@ -55,7 +55,11 @@ function ClaimCard({
         Status: {claim.status}
       </p>
 
-      {children && <div className="mt-4">{children}</div>}
+      {children && (
+        <div className="mt-4">
+          {children}
+        </div>
+      )}
     </div>
   );
 }

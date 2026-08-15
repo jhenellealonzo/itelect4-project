@@ -13,7 +13,6 @@ import type {
 
 import { SubmissionStatus, Role } from "./types/index";
 
-
 // ===== PRIMITIVE TYPE ANNOTATIONS =====
 
 // Variables with explicit types
@@ -22,6 +21,11 @@ const currentYear: number = 2026;
 const isWebApp: boolean = true;
 const nothing: null = null;
 const notSet: undefined = undefined;
+
+// Use the variables so TypeScript does not report them as unused
+console.log("Is Web App:", isWebApp);
+console.log("Nothing:", nothing);
+console.log("Not Set:", notSet);
 
 // Function: typed parameters + typed return value
 function greet(name: string, year: number): string {
@@ -34,7 +38,6 @@ function logMessage(message: string): void {
 }
 
 logMessage(greet(projectName, currentYear));
-
 
 // ===== USING INTERFACES =====
 
@@ -69,7 +72,6 @@ console.log(student);
 console.log(item);
 console.log(claim);
 
-
 // ===== TYPE NARROWING =====
 
 // Narrowing with typeof
@@ -94,7 +96,6 @@ console.log(processInput("wallet"));
 console.log(processInput(101));
 console.log(formatDate(new Date()));
 
-
 // ===== GENERIC FUNCTIONS =====
 
 function getFirst<T>(items: T[]): T | undefined {
@@ -114,7 +115,6 @@ const foundItem = getById<Items>([item], 1);
 console.log(firstUser?.name);
 console.log(foundItem?.name);
 
-
 // ===== GENERIC INTERFACE =====
 
 const userResponse: ApiResponse<User> = {
@@ -129,7 +129,6 @@ const itemResponse: ApiResponse<Items[]> = {
 
 console.log(userResponse.data.name);
 console.log(itemResponse.data[0]?.name);
-
 
 // ===== USING UTILITY TYPES =====
 
@@ -158,6 +157,11 @@ const roleCount: RoleCount = {
   securityAdmin: 5,
 };
 
+// Use the utility-type variables
+console.log("User Update:", patch);
+console.log("User Preview:", preview);
+console.log("Public Profile:", publicProfile);
+console.log("Role Count:", roleCount);
 
 // ===== ReturnType<T> =====
 
@@ -178,7 +182,6 @@ const newClaim: NewClaim = createClaim(1);
 
 console.log(newClaim);
 
-
 // ===== USING ENUMS =====
 
 let status: SubmissionStatus = SubmissionStatus.Approved;
@@ -191,4 +194,4 @@ console.log(status === SubmissionStatus.Rejected);
 
 const currentRole: Role = Role.SecurityAdmin;
 
-console.log(currentRole); // "securityAdmin"
+console.log(currentRole);
