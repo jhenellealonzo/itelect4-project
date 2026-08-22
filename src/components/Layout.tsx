@@ -1,35 +1,29 @@
 import { NavLink, Outlet } from "react-router";
-import { useToggle } from "../hooks/useToggle";
 import useAuthStore from "../store/authStore";
-
+import useUiStore from "../store/uiStore";
 
 function Layout() {
-  // Dark mode is shared by all pages, so it belongs in Layout.
-  const [isDarkMode, toggleDarkMode] = useToggle(false);
-
+  // Dark mode is now stored globally in uiStore.
+  const isDarkMode = useUiStore((state) => state.isDarkMode);
+  const toggleDarkMode = useUiStore((state) => state.toggleDarkMode);
 
   const userName = useAuthStore((state) => state.userName);
   const logout = useAuthStore((state) => state.logout);
 
-
   // Shared navigation-link styles
   const base = "rounded px-3 py-1.5 text-sm";
-
 
   const activeLink =
     `${base} bg-blue-600 font-semibold text-white`;
 
-
   const idleLink =
     `${base} text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700`;
-
 
   const linkClass = ({
     isActive,
   }: {
     isActive: boolean;
   }): string => (isActive ? activeLink : idleLink);
-
 
   return (
     <div className={isDarkMode ? "dark" : ""}>
@@ -39,21 +33,17 @@ function Layout() {
             Campus Lost & Found Tracker
           </span>
 
-
           <NavLink to="/" end className={linkClass}>
             Dashboard
           </NavLink>
-
 
           <NavLink to="/items" className={linkClass}>
             Items
           </NavLink>
 
-
           <NavLink to="/claims" className={linkClass}>
             Claims
           </NavLink>
-
 
           {userName === null ? (
             <NavLink to="/login" className={linkClass}>
@@ -68,7 +58,6 @@ function Layout() {
             </button>
           )}
 
-
           <button
             onClick={toggleDarkMode}
             className="ml-auto rounded bg-gray-800 px-3 py-1.5 text-sm text-white dark:bg-gray-200 dark:text-gray-900"
@@ -77,7 +66,6 @@ function Layout() {
           </button>
         </nav>
 
-
         <main className="p-6">
           <Outlet />
         </main>
@@ -85,6 +73,5 @@ function Layout() {
     </div>
   );
 }
-
 
 export default Layout;
