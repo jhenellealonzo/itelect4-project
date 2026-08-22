@@ -1,0 +1,57 @@
+{
+  "items": [
+    {
+      "id": "1",
+      "name": "Pink Umbrella",
+      "description": "Left in the Library",
+      "location": "Library",
+      "dateLost": "2026-08-01T09:00:00.000Z",
+      "status": "lost",
+      "ownerId": 1
+    },
+    {
+      "id": "2",
+      "name": "Blue Water Bottle",
+      "description": "Found near the Gym",
+      "location": "Gym",
+      "dateLost": "2026-08-02T10:00:00.000Z",
+      "status": "found",
+      "ownerId": 2
+    }
+  ],
+  "claims": [
+    {
+      "id": "1",
+      "itemId": 1,
+      "claimantId": 2,
+      "claimDate": "2026-08-03T09:00:00.000Z",
+      "status": "approved",
+      "proof": "Description of the umbrella and its contents"
+    },
+    {
+      "itemId": 1,
+      "claimantId": 1,
+      "claimDate": "2026-08-22T02:00:38.340Z",
+      "status": "approved",
+      "proof": "2",
+      "id": "F6E1dyseXtw"
+    },
+    {
+      "itemId": 1,
+      "claimantId": 1,
+      "claimDate": "2026-08-22T02:02:50.001Z",
+      "status": "approved",
+      "proof": "3",
+      "id": "mLIEQ5xwWsc"
+    },
+    {
+      "itemId": 2,
+      "claimantId": 1,
+      "claimDate": "2026-08-22T02:11:56.856Z",
+      "status": "approved",
+      "proof": "Student ID and item description",
+      "id": "4eRlfPHXOcs"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
