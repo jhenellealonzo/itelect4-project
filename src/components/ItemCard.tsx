@@ -1,4 +1,6 @@
-import type { ApiItem } from "../types";
+import { Button } from "@/components/ui/button";
+import type { ApiItem } from "@/types";
+
 
 interface ItemCardProps {
   item: ApiItem;
@@ -6,63 +8,61 @@ interface ItemCardProps {
   variant?: "default" | "compact";
 }
 
+
 function ItemCard({
   item,
   onSelect,
   variant = "default",
 }: ItemCardProps) {
+
   const isCompact = variant === "compact";
+
 
   return (
     <div
       className="
         rounded-lg
         border
-        border-gray-200
-        bg-white
+        border-border
+        bg-card
         p-5
         shadow-sm
-        dark:bg-gray-800
-        dark:border-gray-700
       "
     >
-      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+
+      <h3 className="text-lg font-bold text-foreground">
         {item.name}
       </h3>
 
+
       {!isCompact && (
-        <p className="mt-2 text-gray-600 dark:text-gray-300">
+        <p className="mt-2 text-muted-foreground">
           {item.description}
         </p>
       )}
 
-      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+
+      <p className="mt-2 text-sm text-muted-foreground">
         Location: {item.location}
       </p>
 
-      <p className="text-sm text-gray-500 dark:text-gray-400">
+
+      <p className="text-sm text-muted-foreground">
         Status: {item.status}
       </p>
 
-      <button
+
+      <Button
         onClick={() => onSelect(item)}
-        className="
-          mt-4
-          rounded
-          bg-blue-600
-          px-3
-          py-1.5
-          text-sm
-          font-semibold
-          text-white
-          transition
-          hover:bg-blue-700
-        "
+        className="mt-4"
       >
         View Item
-      </button>
+      </Button>
+
+
     </div>
   );
 }
+
 
 export default ItemCard;

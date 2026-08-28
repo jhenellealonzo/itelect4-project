@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
-import type { User } from "../types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+import type { User } from "@/types";
+
 
 interface UserCardProps {
   user: User;
@@ -8,65 +12,90 @@ interface UserCardProps {
   children?: ReactNode;
 }
 
+
 function UserCard({
   user,
   onSelect,
   variant = "default",
   children,
 }: UserCardProps) {
+
+
   const isCompact = variant === "compact";
 
-  const handleClick = (): void => {
-    onSelect(user);
-  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    console.log("Search:", e.target.value);
+
+    console.log(
+      "Search:",
+      e.target.value
+    );
+
   };
 
+
   return (
+
     <div
-      className={`rounded-lg border border-gray-200 bg-white p-5 shadow-sm
-      dark:bg-gray-800 dark:border-gray-700
-      ${isCompact ? "text-sm" : ""}`}
+      className={`
+        rounded-lg
+        border
+        border-border
+        bg-card
+        p-5
+        shadow-sm
+        ${isCompact ? "text-sm" : ""}
+      `}
     >
-      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+
+      <h3 className="text-lg font-bold text-foreground">
         {user.name}
       </h3>
 
+
       {!isCompact && (
         <>
-          <p className="text-gray-600 dark:text-gray-300">
+
+          <p className="text-muted-foreground">
             {user.email}
           </p>
 
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+
+          <p className="text-sm text-muted-foreground">
             Role: {user.role}
           </p>
+
         </>
       )}
 
-      <button
-        onClick={handleClick}
-        className="mt-3 rounded bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-700"
+
+      <Button
+        onClick={() => onSelect(user)}
+        className="mt-3"
       >
         Select
-      </button>
+      </Button>
+
 
       {!isCompact && (
-        <input
+
+        <Input
           onChange={handleChange}
           placeholder="Quick note (demo only)"
-          className="mt-2 w-full rounded border border-gray-300 px-2 py-1 text-sm
-          dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          className="mt-2"
         />
+
       )}
 
+
       {children}
+
     </div>
+
   );
 }
+
 
 export default UserCard;

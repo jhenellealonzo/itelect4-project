@@ -1,24 +1,55 @@
-import { useState } from "react";
 import {
   useQuery,
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
 
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import type { ApiClaim, Claims } from "../types/index";
 import ClaimCard from "../components/ClaimCard";
+
 import { fetchClaims, createClaim } from "../api/client";
 
-function ClaimsPage() {
-  // Local form state because only this page uses these values.
-  const [itemId, setItemId] = useState<string>("");
-  const [proof, setProof] = useState<string>("");
+import {
+  claimSchema,
+  type ClaimFormValues,
+} from "../schemas/claimSchema";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+
+function ClaimsPage() {
   const queryClient = useQueryClient();
 
+
   // =========================
-  // 1. READ: GET /claims
+  // FORM HANDLING
   // =========================
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ClaimFormValues>({
+    resolver: zodResolver(claimSchema),
+    mode: "onBlur",
+    defaultValues: {
+      itemId: "",
+      proof: "",
+    },
+  });
+
+
+
+  // =========================
+  // READ CLAIMS
+  // =========================
+
   const {
     data,
     isPending,
@@ -28,8 +59,6 @@ function ClaimsPage() {
     queryKey: ["claims"],
     queryFn: fetchClaims,
 
-    // Convert API values into the Claims type
-    // used by ClaimCard.
     select: (claims) =>
       claims.map((claim) => ({
         ...claim,
@@ -38,41 +67,56 @@ function ClaimsPage() {
       })),
   });
 
+
+
   // =========================
-  // 2. WRITE: POST /claims
+  // CREATE CLAIM
   // =========================
+
   const addClaim = useMutation({
+
     mutationFn: createClaim,
 
     onSuccess: () => {
-      // The claims list is now outdated.
-      // React Query will fetch the updated list.
+
       queryClient.invalidateQueries({
         queryKey: ["claims"],
       });
 
-      // Clear the form after successful submission.
-      setItemId("");
-      setProof("");
+      reset();
     },
+
   });
 
-  // =========================
-  // 3. HANDLE FORM SUBMISSION
-  // =========================
-  const handleAdd = (): void => {
-    addClaim.mutate({
-      itemId: Number(itemId),
-      claimantId: 1,
-      claimDate: new Date().toISOString(),
-      status: "approved",
-      proof: proof,
-    });
-  };
+
 
   // =========================
-  // 4. LOADING STATE
+  // SUBMIT
   // =========================
+
+  const onSubmit = (
+    values: ClaimFormValues
+  ): void => {
+
+    addClaim.mutate({
+
+      itemId: Number(values.itemId),
+
+      claimantId: 1,
+
+      claimDate:
+        new Date().toISOString(),
+
+      status: "approved",
+
+      proof: values.proof,
+
+    });
+
+  };
+
+
+
   if (isPending) {
     return (
       <div className="animate-pulse p-6">
@@ -81,9 +125,8 @@ function ClaimsPage() {
     );
   }
 
-  // =========================
-  // 5. ERROR STATE
-  // =========================
+
+
   if (isError) {
     return (
       <div className="rounded-lg bg-red-50 p-4 text-red-700">
@@ -92,67 +135,228 @@ function ClaimsPage() {
     );
   }
 
-  // =========================
-  // 6. DISPLAY CLAIMS
-  // =========================
+
+
   return (
     <div>
+
       <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
         My Claims
       </h2>
 
-      {/* Claim form */}
-      <div className="mb-6 flex flex-col gap-2 sm:flex-row">
-        <input
-          type="number"
-          value={itemId}
-          onChange={(e) => setItemId(e.target.value)}
-          placeholder="Item ID"
-          className="rounded border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-        />
 
-        <input
-          value={proof}
-          onChange={(e) => setProof(e.target.value)}
-          placeholder="Proof of ownership"
-          className="w-full rounded border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-        />
 
-        <button
-          onClick={handleAdd}
-          disabled={
-            itemId === "" ||
-            proof === "" ||
-            addClaim.isPending
-          }
-          className="rounded bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:bg-gray-400"
+      {/* CLAIM FORM */}
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="
+          mb-6
+          grid
+          gap-4
+          rounded-lg
+          border
+          border-gray-200
+          p-4
+          dark:border-gray-700
+        "
+      >
+
+
+
+        {/* ITEM ID */}
+
+        <div className="grid gap-1.5">
+
+          <Label
+            htmlFor="itemId"
+            className="text-gray-900 dark:text-white"
+          >
+            Item ID
+          </Label>
+
+
+
+          <Input
+
+            id="itemId"
+
+            type="number"
+
+            {...register("itemId")}
+
+            placeholder="Enter item ID"
+
+            className="
+              bg-white
+              text-gray-900
+              placeholder:text-gray-500
+
+              dark:bg-gray-900
+              dark:text-white
+              dark:placeholder:text-gray-400
+              dark:border-gray-600
+            "
+
+            aria-invalid={
+              errors.itemId
+                ? true
+                : undefined
+            }
+
+          />
+
+
+
+          {errors.itemId && (
+
+            <p className="text-sm text-red-600">
+
+              {errors.itemId.message}
+
+            </p>
+
+          )}
+
+        </div>
+
+
+
+
+
+        {/* PROOF */}
+
+        <div className="grid gap-1.5">
+
+
+          <Label
+            htmlFor="proof"
+            className="text-gray-900 dark:text-white"
+          >
+            Proof of ownership
+          </Label>
+
+
+
+          <Input
+
+            id="proof"
+
+            {...register("proof")}
+
+            placeholder="Describe proof of ownership"
+
+
+            className="
+              bg-white
+              text-gray-900
+              placeholder:text-gray-500
+
+              dark:bg-gray-900
+              dark:text-white
+              dark:placeholder:text-gray-400
+              dark:border-gray-600
+            "
+
+
+            aria-invalid={
+              errors.proof
+                ? true
+                : undefined
+            }
+
+          />
+
+
+
+          {errors.proof && (
+
+            <p className="text-sm text-red-600">
+
+              {errors.proof.message}
+
+            </p>
+
+          )}
+
+
+        </div>
+
+
+
+
+        <Button
+          type="submit"
+          disabled={addClaim.isPending}
+          className="justify-self-start"
         >
-          {addClaim.isPending ? "Saving..." : "Add Claim"}
-        </button>
-      </div>
 
-      {/* Mutation error */}
+          {
+            addClaim.isPending
+              ? "Saving..."
+              : "Add Claim"
+          }
+
+        </Button>
+
+
+
+      </form>
+
+
+
+
+
+      {/* MUTATION ERROR */}
+
       {addClaim.isError && (
+
         <p className="mb-4 text-sm text-red-700">
+
           {addClaim.error.message}
+
         </p>
+
       )}
 
-      {/* Claims list */}
+
+
+
+
+
+
+      {/* CLAIM LIST */}
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
         {data.map((claim) => (
+
           <ClaimCard
+
             key={claim.id}
+
             claim={claim}
+
           >
+
             <p className="text-sm text-gray-500 dark:text-gray-400">
+
               Proof: {claim.proof}
+
             </p>
+
+
           </ClaimCard>
+
         ))}
+
+
       </div>
+
+
     </div>
   );
 }
+
 
 export default ClaimsPage;

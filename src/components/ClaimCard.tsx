@@ -1,5 +1,6 @@
-import type { Claims } from "../types";
 import type { ReactNode } from "react";
+import type { Claims } from "@/types";
+
 
 interface ClaimCardProps {
   claim: Claims;
@@ -7,61 +8,82 @@ interface ClaimCardProps {
   children?: ReactNode;
 }
 
+
 function ClaimCard({
   claim,
   variant = "default",
   children,
 }: ClaimCardProps) {
+
+
   const isCompact = variant === "compact";
+
 
   return (
     <div
       className="
         rounded-lg
         border
-        border-gray-200
-        bg-white
+        border-border
+        bg-card
         p-5
         shadow-sm
-        dark:border-gray-700
-        dark:bg-gray-800
       "
     >
-      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+
+      <h3 className="text-lg font-bold text-foreground">
         Claim Information
       </h3>
 
-      <p className="mt-2 text-gray-600 dark:text-gray-300">
+
+      <p className="mt-2 text-muted-foreground">
         Claim ID: {claim.id}
       </p>
 
+
       {!isCompact && (
         <>
-          <p className="text-gray-600 dark:text-gray-300">
+
+          <p className="text-muted-foreground">
             Item ID: {claim.itemId}
           </p>
 
-          <p className="text-gray-600 dark:text-gray-300">
+
+          <p className="text-muted-foreground">
             Claimant ID: {claim.claimantId}
           </p>
 
-          <p className="text-gray-600 dark:text-gray-300">
+
+          <p className="text-muted-foreground">
             Proof: {claim.proof}
           </p>
+
         </>
       )}
 
-      <p className="mt-2 text-sm font-semibold text-green-600 dark:text-green-400">
+
+      <p
+        className="
+          mt-2
+          text-sm
+          font-semibold
+          text-green-600
+        "
+      >
         Status: {claim.status}
       </p>
+
 
       {children && (
         <div className="mt-4">
           {children}
         </div>
       )}
+
+
     </div>
   );
 }
+
 
 export default ClaimCard;

@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router";
 
+import { Button } from "@/components/ui/button";
+
 import type { ApiItem } from "../types/index";
 import ItemCard from "../components/ItemCard";
 import { fetchItemById } from "../api/client";
@@ -45,17 +47,17 @@ function ItemDetailPage() {
       <div className="max-w-sm">
         <ItemCard
           item={data}
-          onSelect={() => {}}
+          onSelect={() => { }}
           variant="default"
         />
       </div>
 
-      <button
+      <Button
         onClick={() => navigate("/items")}
-        className="mt-4 rounded bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+        className="mt-4"
       >
         Back to Items
-      </button>
+      </Button>
     </div>
   );
 }
