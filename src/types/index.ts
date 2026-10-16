@@ -24,7 +24,7 @@ export interface Claims {
   itemId: number;
   claimantId: number;
   claimDate: Date;
-  status: "approved" | "rejected";
+  status: "pending" | "approved" | "rejected";
   proof: string;
 }
 
@@ -158,26 +158,43 @@ export interface ApiResponse<T> {
 
 // ===== GT3 API TYPES =====
 // JSON cannot represent JavaScript Date objects.
-// json-server also returns IDs as strings.
+// The API returns MongoDB IDs as strings.
 // These API types are derived from the main application types
 // so Items and Claims remain the single source of truth.
 
 // API response for an Item
-export type ApiItem = Omit<Items, "id" | "dateLost"> & {
+export type ApiItem = Omit<Items, "id" | "ownerId" | "dateLost"> & {
   id: string;
+  ownerId: string;
   dateLost: string;
 };
 
 // Data sent when creating a new Item.
 // The server creates the ID.
-export type NewItem = Omit<ApiItem, "id">;
+export type NewItem = Omit<ApiItem, "id" | "ownerId">;
 
 // API response for a Claim
-export type ApiClaim = Omit<Claims, "id" | "claimDate"> & {
+export type ApiClaim = Omit<
+  Claims,
+  "id" | "itemId" | "claimantId" | "claimDate"
+> & {
   id: string;
+  itemId: string;
+  claimantId: string;
   claimDate: string;
 };
 
 // Data sent when creating a new Claim.
-// The server creates the ID.
-export type NewClaim = Omit<ApiClaim, "id">;
+// The server creates the ID, claimant, date, and initial status.
+export type NewClaim = Pick<Claims, "proof"> & {
+  itemId: string;
+};
+
+export type ApiUser = Omit<User, "id"> & {
+  id: string;
+};
+
+export interface AuthReply {
+  token: string;
+  user: ApiUser;
+}

@@ -1,82 +1,97 @@
-// src/api/client.ts
-
-// Every call to json-server lives in this file.
-// Components should NOT call fetch() directly.
-
 import type {
-  ApiItem,
   ApiClaim,
+  ApiItem,
+  AuthReply,
   NewClaim,
-} from "../types/index";
+} from "../types";
+import useAuthStore from "../store/authStore";
 
-export const API_URL = "http://localhost:3001";
+export const API_URL = import.meta.env.VITE_API_URL;
 
-// ============================================================
-// ITEMS
-// ============================================================
-
-// GET /items
-// Gets all lost and found items.
-export async function fetchItems(): Promise<ApiItem[]> {
-  const res = await fetch(`${API_URL}/items`);
-
-  if (!res.ok) {
-    throw new Error("Could not load items");
-  }
-
-  return res.json();
+if (!API_URL) {
+  throw new Error(
+    "VITE_API_URL is missing. Copy .env.example to .env, fill it in, and restart npm run dev.",
+  );
 }
 
+export async function request<T>(
+  path: string,
+  init: RequestInit = {},
+): Promise<T> {
+  const token = useAuthStore.getState().token;
+  const headers = new Headers(init.headers);
 
-// GET /items/:id
-// Gets one item using its ID.
-export async function fetchItemById(
-  id: string
-): Promise<ApiItem> {
-  const res = await fetch(`${API_URL}/items/${id}`);
-
-  if (!res.ok) {
-    throw new Error("Could not load that item");
+  if (!headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
   }
 
-  return res.json();
-}
-
-
-// ============================================================
-// CLAIMS
-// ============================================================
-
-// GET /claims
-// Gets all claims.
-export async function fetchClaims(): Promise<ApiClaim[]> {
-  const res = await fetch(`${API_URL}/claims`);
-
-  if (!res.ok) {
-    throw new Error("Could not load claims");
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
   }
 
-  return res.json();
-}
-
-
-// POST /claims
-// Creates a new claim.
-// json-server generates the ID.
-export async function createClaim(
-  newClaim: NewClaim
-): Promise<ApiClaim> {
-  const res = await fetch(`${API_URL}/claims`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(newClaim),
+  const response = await fetch(`${API_URL}${path}`, {
+    ...init,
+    headers,
   });
 
-  if (!res.ok) {
-    throw new Error("Could not save the claim");
+  let body: unknown = null;
+  try {
+    body = await response.json();
+  } catch {
+    // Some error responses have no JSON body.
   }
 
-  return res.json();
+  if (!response.ok) {
+    const message =
+      typeof body === "object" &&
+      body !== null &&
+      "message" in body &&
+      typeof body.message === "string"
+        ? body.message
+        : `Request failed (${response.status})`;
+
+    throw new Error(message);
+  }
+
+  return body as T;
+}
+
+export function fetchItems(): Promise<ApiItem[]> {
+  return request<ApiItem[]>("/api/items");
+}
+
+export function fetchItemById(id: string): Promise<ApiItem> {
+  return request<ApiItem>(`/api/items/${id}`);
+}
+
+export function fetchClaims(): Promise<ApiClaim[]> {
+  return request<ApiClaim[]>("/api/claims");
+}
+
+export function createClaim(newClaim: NewClaim): Promise<ApiClaim> {
+  return request<ApiClaim>("/api/claims", {
+    method: "POST",
+    body: JSON.stringify(newClaim),
+  });
+}
+
+export function registerUser(values: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<AuthReply["user"]> {
+  return request<AuthReply["user"]>("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify(values),
+  });
+}
+
+export function loginUser(values: {
+  email: string;
+  password: string;
+}): Promise<AuthReply> {
+  return request<AuthReply>("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify(values),
+  });
 }

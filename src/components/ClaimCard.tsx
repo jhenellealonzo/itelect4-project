@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
-import type { Claims } from "@/types";
+import type { ApiClaim } from "@/types";
 
 
 interface ClaimCardProps {
-  claim: Claims;
+  claim: ApiClaim;
   variant?: "default" | "compact";
   children?: ReactNode;
 }
