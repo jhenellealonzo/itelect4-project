@@ -8,12 +8,11 @@ import type { ApiItem } from "@/types";
 import ItemCard from "@/components/ItemCard";
 import { usePrevious } from "@/hooks/usePrevious";
 import useUiStore from "@/store/uiStore";
-import { fetchItems } from "@/api/client";
+import { API_URL, fetchItems } from "@/api/client";
 
 
 function ItemsPage() {
 
-  // React Query fetches items from json-server
   const {
     data,
     isPending,
@@ -64,7 +63,7 @@ function ItemsPage() {
       <div className="rounded-lg bg-red-50 p-4 text-red-700">
         {error.message}
         <br />
-        Is json-server running on port 3001?
+        Tried {API_URL}/api/items
       </div>
     );
   }

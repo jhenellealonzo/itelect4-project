@@ -7,6 +7,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ItemsPage from "./pages/ItemsPage";
 import ClaimsPage from "./pages/ClaimsPage";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ItemDetailPage from "./pages/ItemDetailPage";
 
@@ -22,6 +23,7 @@ function App() {
         <Route path="/items/:id" element={<ItemDetailPage />} />
 
         <Route path="login" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} />
 
         {/* PROTECTED ROUTES */}
         <Route element={<ProtectedRoute />}>

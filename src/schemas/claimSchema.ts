@@ -3,7 +3,7 @@ import { z } from "zod";
 export const claimSchema = z.object({
   itemId: z
     .string()
-    .min(1, "Item ID is required."),
+    .regex(/^[0-9a-fA-F]{24}$/, "Select a valid item."),
 
   proof: z
     .string()
