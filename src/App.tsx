@@ -10,6 +10,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ItemDetailPage from "./pages/ItemDetailPage";
+import ReviewPage from "./pages/ReviewPage";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         {/* PROTECTED ROUTES */}
         <Route element={<ProtectedRoute />}>
           <Route path="claims" element={<ClaimsPage />} />
+          <Route path="review" element={<ReviewPage />} />
         </Route>
 
         {/* 404 */}

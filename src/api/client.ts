@@ -1,5 +1,6 @@
 import type {
   ApiClaim,
+  AiItemReportReview,
   ApiItem,
   AuthReply,
   NewClaim,
@@ -93,5 +94,12 @@ export function loginUser(values: {
   return request<AuthReply>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify(values),
+  });
+}
+
+export function askAi(prompt: string): Promise<AiItemReportReview> {
+  return request<AiItemReportReview>("/api/ai", {
+    method: "POST",
+    body: JSON.stringify({ prompt }),
   });
 }

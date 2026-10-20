@@ -198,3 +198,10 @@ export interface AuthReply {
   token: string;
   user: ApiUser;
 }
+
+export interface AiItemReportReview {
+  summary: string;
+  keyDetails: string[];
+  suggestions: string[];
+  readiness: "ready" | "almost" | "not-yet";
+}
