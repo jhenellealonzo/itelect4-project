@@ -1,14 +1,18 @@
-import { useEffect, useRef } from "react";
+import { useState } from "react";
 
-// Generic hook that remembers the previous value
+// Generic hook that remembers the previous render value.
 export function usePrevious<T>(
   value: T
 ): T | undefined {
-  const ref = useRef<T>(undefined);
+  const [current, setCurrent] = useState(value);
+  const [previous, setPrevious] = useState<T>();
 
-  useEffect(() => {
-    ref.current = value;
-  }, [value]);
+  if (!Object.is(current, value)) {
+    setPrevious(current);
+    setCurrent(value);
+  }
 
-  return ref.current;
+  return previous;
 }
+
+export default usePrevious;

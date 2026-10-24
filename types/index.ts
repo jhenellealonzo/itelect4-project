@@ -1,11 +1,7 @@
 // ===== SPECIAL TYPES =====
 
-// any -- disables TypeScript type checking
-// [!] Avoid using this; it defeats the purpose of TypeScript
-let anything: any = "hello";
-
-anything = 42; // No error
-anything = true; // No error
+// A union type accurately describes the values represented by this example.
+const anything: string | number | boolean = true;
 
 // Use the variable so TypeScript does not report it as unused
 console.log("any value:", anything);
@@ -13,7 +9,7 @@ console.log("any value:", anything);
 
 // unknown -- the safer version of any
 // You MUST check the type before using it
-let userInput: unknown = "test";
+const userInput: unknown = "test";
 
 if (typeof userInput === "string") {
   console.log(userInput.toUpperCase());
